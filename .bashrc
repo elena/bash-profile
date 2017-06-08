@@ -3,7 +3,10 @@
 # for examples
 
 # If not running interactively, don't do anything
-[ -z "$PS1" ] && return
+case $- in
+    *i*) ;;
+      *) return;;
+esac
 
 # don't put duplicate lines or lines starting with space in the history.
 # See bash(1) for more options
@@ -28,13 +31,13 @@ shopt -s checkwinsize
 [ -x /usr/bin/lesspipe ] && eval "$(SHELL=/bin/sh lesspipe)"
 
 # set variable identifying the chroot you work in (used in the prompt below)
-if [ -z "$debian_chroot" ] && [ -r /etc/debian_chroot ]; then
+if [ -z "${debian_chroot:-}" ] && [ -r /etc/debian_chroot ]; then
     debian_chroot=$(cat /etc/debian_chroot)
 fi
 
 # set a fancy prompt (non-color, unless we know we "want" color)
 case "$TERM" in
-    xterm-color) color_prompt=yes;;
+    xterm-color|*-256color) color_prompt=yes;;
 esac
 
 # uncomment for a colored prompt, if the terminal has the capability; turned
@@ -81,6 +84,9 @@ if [ -x /usr/bin/dircolors ]; then
     alias egrep='egrep --color=auto'
 fi
 
+# colored GCC warnings and errors
+#export GCC_COLORS='error=01;31:warning=01;35:note=01;36:caret=01;32:locus=01:quote=01'
+
 # some more ls aliases
 alias ll='ls -alF'
 alias la='ls -A'
@@ -102,133 +108,73 @@ fi
 # enable programmable completion features (you don't need to enable
 # this, if it's already enabled in /etc/bash.bashrc and /etc/profile
 # sources /etc/bash.bashrc).
-if [ -f /etc/bash_completion ] && ! shopt -oq posix; then
+if ! shopt -oq posix; then
+  if [ -f /usr/share/bash-completion/bash_completion ]; then
+    . /usr/share/bash-completion/bash_completion
+  elif [ -f /etc/bash_completion ]; then
     . /etc/bash_completion
+  fi
 fi
 
+# ~/.bashrc: executed by bash(1) for non-login shells.
+# see /usr/share/doc/bash/examples/startup-files (in the package bash-doc)
+# for examples
 
-# python
-export PIP_DOWNLOAD_CACHE=$HOME/.pip_download_cache
-export PYTHONDONTWRITEBYTECODE=1
+## ******************************************
+## Elena customisations
+## ******************************************
 
 
-export EDITOR=emacs
+
+export GPGKEY=48C03FDA
+
+# # Ubuntu nice defaults
+/usr/bin/setxkbmap -option ctrl:nocaps
+alias python=python3
+export PYTHONDONTWRITEBYTECODE='None'
+
+# Virtualenvwrapper
+. /usr/local/bin/virtualenvwrapper.sh
+export WORKON_HOME=~/.virtualenvs
+alias activate='workon ${PWD##*/}
+'
+
+### Added by the Heroku Toolbelt
+export PATH="/usr/local/heroku/bin:$PATH"
+source ~/.autoenv/activate.sh
+
+
+## Elena aliases
+## ******************************************
+
+# Task
+alias tasks='source ~/task/tasks.sh'
+
+# Bash
 alias reload='source ~/.bashrc'
-alias rm='rm -i'
 
-# Git
-alias gtt='git status'
-alias gts='git status'
-alias gtb='git branch'
-alias gtc='git checkout'
-alias gtcd='git checkout development'
+alias xclip="xclip -selection c"
 
-alias gtpl='git pull'
-alias gtps='git push'
-alias gtpld='git pull origin development'
-alias gtpsd='git push origin development'
-alias gtplm='git pull origin master'
-alias gtpsm='git push origin master'
+## https://github.com/nvbn/thefuck
+alias fuck='eval $(thefuck $(fc -ln -1)); history -r'
+alias FUCK='fuck'
 
 # Django
-alias rs='./manage.py runserver'
-alias rs8='./manage.py runserver 8888'
-alias rsie='./manage.py runserver 0.0.0.0:8000'
-
-alias vd='./manage.py validate'
-
-alias djsh='./manage.py shell'
-alias djts='./manage.py test'
-alias djvl='./manage.py validate'
-alias djvd='./manage.py validate'
-
-alias djdb='./manage.py syncdb'
-alias djsm='./manage.py schemamigration --auto'
-alias djmg='./manage.py migrate'
-
-alias djdd='./manage.py dumpdata --indent 4 --natural'
-alias djld='./manage.py loaddata'
-
-alias rmpyc='find . -name "*.pyc" |xargs rm'
-
-# Everyone needs a little color in their lives
-RED='\[\033[31m\]' #
-GREEN='\[\033[32m\]' #
-YELLOW='\[\033[33m\]'
-BLUE='\[\033[34m\]' #
-PURPLE='\[\033[35m\]' #
-CYAN='\[\033[36m\]'
-WHITE='\[\033[37m\]'
-GREY='\[\033[37m\]'
-NIL='\[\033[00m\]'
-
-# Hostname styles
-FULL='\H'
-SHORT='\h'
-
-# System => color/hostname map:
-# UC: username color
-# LC: location/cwd color
-# HD: hostname display (\h vs \H)
-# Defaults:
-UC=$PURPLE
-LC=$BLUE
-VE=$GREY
-GITBRANCH=$GREEN
-HD=$FULL
-
-# Prompt function because PROMPT_COMMAND is awesome
-function set_prompt() {
-    # show the host only and be done with it.
-    host="${UC}${HD}${NIL}"
-
-    # Special vim-tab-like shortpath (~/folder/directory/foo => ~/f/d/foo)
-    _pwd=`pwd | sed "s#$HOME#~#"`
-    if [[ $_pwd == "~" ]]; then
-       _dirname=$_pwd
-    else
-       _dirname=`dirname "$_pwd" `
-        if [[ $_dirname == "/" ]]; then
-              _dirname=""
-        fi
-       _dirname="$_dirname/`basename "$_pwd"`"
-    fi
-    path="${LC}${_dirname}${NIL}"
-    myuser="${UC}\u@${NIL}"
-
-    # Dirtiness from:
-    # http://henrik.nyh.se/2008/12/git-dirty-prompt#comment-8325834
-    if git update-index -q --refresh 2>/dev/null; git diff-index --quiet --cached HEAD --ignore-submodules -- 2>/dev/null && git diff-files --quiet --ignore-submodules 2>/dev/null
-        then dirty=""
-    else
-       dirty="${RED}*${NIL}"
-    fi
-    _branch=$(git symbolic-ref HEAD 2>/dev/null)
-    _branch=${_branch#refs/heads/} # apparently faster than sed
-    branch="" # need this to clear it when we leave a repo
-    if [[ -n $_branch ]]; then
-       branch="${NIL}[${GITBRANCH}${_branch}${dirty}${NIL}]"
-    fi
-
-    # Dollar/pound sign
-    end="${LC}\$${NIL} "
-
-    # Virtual Env
-    if [[ $VIRTUAL_ENV != "" ]]
-       then
-           venv="${VE}(${VIRTUAL_ENV##*/})"
-    else
-       venv=''
-    fi
-
-    export PS1="${venv}${myuser}${path}${branch} ${end}"
-}
-
-export PROMPT_COMMAND=set_prompt
+alias rs='./manage.py runserver 0.0.0.0:8000'
+alias rs1='./manage.py runserver 0.0.0.0:8001'
+alias rs2='./manage.py runserver 0.0.0.0:8002'
+alias mailserver='python -m smtpd -n -c DebuggingServer localhost:1025'
+alias webserver='python -m SimpleHTTPServer'
+alias runmail='python -m smtpd -n -c DebuggingServer localhost:1025'
 
 
-# Still undecided about .git-prompt
-# Load in the git branch prompt script.
-# curl https://raw.github.com/git/git/master/contrib/completion/git-prompt.sh -o ~/.git-prompt.sh
-#### source ~/.git-prompt.sh
-#### PS1="\[$BLUE\]\t\[$RED\]-\[$GREEN\]\u\[$YELLOW\]\[$YELLOW\]\w\[\033[m\]\[$MAGENTA\]\$(__git_ps1)\[$WHITE\]\$ "
+## end Elena customisations
+## ******************************************
+
+
+source ~/Dropbox/_.code/src/git/contrib/completion/git-prompt.sh
+PS1='[\u@\h \W$(__git_ps1 " (%s)")]\$ '
+GIT_PS1_SHOWDIRTYSTATE=1
+GIT_PS1_SHOWCOLORHINTS=1
+
+export CDPATH=.:/home/elena/Dropbox/Guild/Websites:/home/elena/Dropbox/Guild
