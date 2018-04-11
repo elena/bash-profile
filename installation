@@ -1,0 +1,23 @@
+sudo add-apt-repository ppa:graphics-drivers
+sudo apt-get update
+
+sudo apt install nvidia-384
+sudo apt install mate-terminal emacs git git-cola gitg python-pip python-dev python3-pip python3-dev vlc gimp inkscape blender default-jre default-jre-headless
+
+sudo pip3 install --upgrade pip
+sudo pip3 install virtualenv virtualenvwrapper thefuck pyflakes ipython jedi flake8 importmagic autopep8
+
+git config --global user.email "git@elena.net.au"
+git config --global user.name "Elena Williams"
+
+git clone https://github.com/elena/.emacs.git ~/.emacs.d
+git clone https://github.com/magicmonty/bash-git-prompt.git ~/.bash-git-prompt --depth=1
+
+https://raw.githubusercontent.com/elena/bash-profile/linux/.bashrc
+
+# Install Neo4J
+wget --no-check-certificate -O - https://debian.neo4j.org/neotechnology.gpg.key | sudo apt-key add -
+echo 'deb http://debian.neo4j.org/repo stable/' | sudo tee /etc/apt/sources.list.d/neo4j.list
+sudo apt update
+sudo apt install neo4j
+sudo service neo4j start
