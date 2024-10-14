@@ -10,15 +10,15 @@ fi
 # export PATH=$HOME/bin:/usr/local/bin:$PATH
 
 # Path to your oh-my-zsh installation.
-export ZSH="$HOME/.oh-my-zsh"
-source $ZSH/oh-my-zsh.sh
+#export ZSH="$HOME/.oh-my-zsh"
+#source $ZSH/oh-my-zsh.sh
 
 # Set name of the theme to load --- if set to "random", it will
 # load a random theme each time oh-my-zsh is loaded, in which case,
 # to know which specific one was loaded, run: echo $RANDOM_THEME
 # See https://github.com/ohmyzsh/ohmyzsh/wiki/Themes
 # ZSH_THEME="robbyrussell"
-ZSH_THEME="powerlevel10k/powerlevel10k"
+#ZSH_THEME="powerlevel10k/powerlevel10k"
 
 
 # Elena customisations
@@ -30,16 +30,23 @@ export PYTHONDONTWRITEBYTECODE=1
 export PIP_DOWNLOAD_CACHE=$HOME/Library/Caches/pip
 
 
-export CURRENT_PYTHON="/opt/homebrew/bin/python3.10"
+# export CURRENT_PYTHON="/opt/homebrew/bin/python3.10"
+export CURRENT_PYTHON="/Users/ElenaW/psma/data-pipeline-platform/.venv/bin/python3.10"
+
 
 alias python=$CURRENT_PYTHON
 alias python3=$CURRENT_PYTHON
+alias python3.10=$CURRENT_PYTHON
 export PATH=$CURRENT_PYTHON:$PATH
 
-export VIRTUALENVWRAPPER_PYTHON=$CURRENT_PYTHON
-export WORKON_HOME=$HOME/.venvs
-export PROJECT_HOME=$HOME/Code
-source /opt/homebrew/bin/virtualenvwrapper.sh
+
+# 20241014: version aws-cli/1.35.5 Python/3.8.19 Darwin/24.0.0 botocore/1.35.39
+alias aws=/usr/local/bin/aws
+
+# export VIRTUALENVWRAPPER_PYTHON=$CURRENT_PYTHON
+# export WORKON_HOME=$HOME/.venvs
+# export PROJECT_HOME=$HOME/Code
+# source /opt/homebrew/bin/virtualenvwrapper.sh
 
 alias nb="cd ~/_.notebooks&&pipenv shell"
 alias jp="jupyter notebook --port 8889"
@@ -113,9 +120,9 @@ export GRPC_PYTHON_BUILD_SYSTEM_ZLIB=1
 
 eval "$(direnv hook zsh)"
 
-export PYENV_ROOT="$HOME/.pyenv"
-[[ -d $PYENV_ROOT/bin ]] && export PATH="$PYENV_ROOT/bin:$PATH"
-eval "$(pyenv init -)"
+#export PYENV_ROOT="$HOME/.pyenv"
+#[[ -d $PYENV_ROOT/bin ]] && export PATH="$PYENV_ROOT/bin:$PATH"
+#eval "$(pyenv init -)"
 
 # To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
-[[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
+# [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
